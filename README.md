@@ -72,4 +72,3 @@ Use `server/.env.example` as the template.
 
 - The planning presentation is embedded directly in the website.
 - The admin workflow uses the existing backend APIs and JWT session storage.
-- AWS, S3, and deployment automation are intentionally not part of this README yet.
