@@ -2,8 +2,47 @@ import { useEffect, useState } from 'react'
 
 const adminTokenKey = 'smarttoken-admin-token'
 const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-const planningV1PageCount = 12
-const planningV1PageImage = page => `/presentations/planning-v1-pages/page-${String(page).padStart(2, '0')}.png`
+
+const presentations = [
+  {
+    id: 'planning-v2',
+    number: '02',
+    eyebrow: 'Current deliverable',
+    isCurrent: true,
+    title: 'Planning Presentation v2',
+    summary: 'Technical presentation covering AI-assisted, faculty-controlled participation, architecture, prototype status, and roadmap.',
+    lead: 'Updated technical presentation for the SmartToken participation and token management system.',
+    date: '—',
+    version: 'v2',
+    authors: 'Arnav Chachra · Kunwar Shauryaveer · Piyush Sharan',
+    stageLabel: 'SmartToken / Planning v2',
+    pdfUrl: '/presentations/planning-v2.pdf',
+    pageCount: 8,
+    pageImagePrefix: '/presentations/planning-v2-pages',
+    versionNotes: 'v2 · System objective, architecture, participation-to-token flow, AI-assisted evaluation, security & data integrity, prototype status, and roadmap.',
+  },
+  {
+    id: 'planning-v1',
+    number: '01',
+    eyebrow: 'Previous deliverable',
+    isCurrent: false,
+    title: 'Planning Presentation v1',
+    summary: 'Initial planning presentation for the SmartToken project.',
+    lead: 'The team will present this planning material directly from the SmartToken website.',
+    date: '—',
+    version: 'v1',
+    authors: 'Arnav Chachra · Kunwar Shauryaveer · Piyush Sharan',
+    stageLabel: 'SmartToken / Planning v1',
+    pdfUrl: '/presentations/planning-v1.pdf',
+    pageCount: 12,
+    pageImagePrefix: '/presentations/planning-v1-pages',
+    versionNotes: 'v1 · Initial planning presentation.',
+  },
+]
+
+function getPresentationPageImage(prefix, page) {
+  return `${prefix}/page-${String(page).padStart(2, '0')}.png`
+}
 
 async function parseJson(response) {
   const text = await response.text()
@@ -110,9 +149,10 @@ const navigation = [
 ]
 
 const teamMembers = [
-  { name: 'Arnav Chachra', id: '1024170073', role: 'Backend & Testing' },
+  { name: 'Arnav Chachra', id: '1024170073', role: 'Backend' },
   { name: 'Kunwar Shauryaveer', id: '1024170078', role: 'Frontend' },
-  { name: 'Piyush Sharan', id: '1024170072', role: 'Database & Documentation' },
+  { name: 'Piyush Sharan', id: '1024170072', role: 'Database' },
+  { name: 'Nachiket Singla', id: '1024170077', role: 'Testing & Documentation' },
 ]
 
 const problemStatement = '“Recording participation awards during a live university lab interrupts the faculty workflow and can lead to missed, delayed, or incorrectly attributed entries. SmartToken will reduce that interruption while preserving faculty control, correction history, and reliable operation during network failure.”'
@@ -127,12 +167,14 @@ function App() {
   }, [])
 
   const page = route.replace('#/', '') || 'home'
+  const presentationById = Object.fromEntries(presentations.map(item => [item.id, item]))
   const pages = {
     home: <Home />,
     project: <Project />,
     team: <Team />,
     presentations: <Presentations />,
-    'planning-v1': <PlanningV1 />,
+    'planning-v2': <PresentationPage key="planning-v2" presentation={presentationById['planning-v2']} />,
+    'planning-v1': <PresentationPage key="planning-v1" presentation={presentationById['planning-v1']} />,
     admin: <Admin />,
   }
 
@@ -166,7 +208,7 @@ function Home() {
         <h1 id="hero-title">Participation recording that <em>respects the room.</em></h1>
         <p className="lead">SmartToken is a faculty-controlled participation and token system designed to keep live lab teaching moving while making every award, correction, and rule accountable.</p>
         <div className="actions">
-          <a className="button" href="#/planning-v1">Open Planning Presentation v1 <ArrowIcon /></a>
+          <a className="button" href="#/planning-v2">Open Planning Presentation v2 <ArrowIcon /></a>
           <a className="text-link" href="#/project">Explore the project <ArrowIcon /></a>
         </div>
       </div>
@@ -199,7 +241,7 @@ function Home() {
     <section className="section timeline-section" aria-labelledby="milestone-heading">
       <div className="section-heading"><p className="eyebrow">Current project status</p><h2 id="milestone-heading">Planning the path to a live-lab pilot.</h2></div>
       <ol className="timeline">
-        <li className="current"><span>Now</span><div><h3>Planning Presentation v1</h3><p>The current deliverable establishes the project direction, workflow, and engineering plan.</p><a href="#/planning-v1">View the presentation page <ArrowIcon /></a></div></li>
+        <li className="current"><span>Now</span><div><h3>Planning Presentation v2</h3><p>The current deliverable updates the project architecture, evaluation pipeline, prototype status, and roadmap.</p><a href="#/planning-v2">View the presentation page <ArrowIcon /></a></div></li>
         <li><span>Week 7</span><div><h3>Usable pilot</h3><p>A usable SmartToken pilot is targeted for the team’s planned workflow.</p></div></li>
         <li><span>Weeks 9–15</span><div><h3>Supervised live-lab deployment</h3><p>Planned deployment in university labs under supervision.</p></div></li>
       </ol>
@@ -227,43 +269,77 @@ function Team() { return <section className="page">
   <div className="team-note"><PrivacyIcon /><p><strong>Roles represented in the system:</strong> Faculty, TA, Student, and Administrator. These are SmartToken user roles, distinct from the team’s own project responsibilities.</p></div>
 </section> }
 
-function Presentations() { return <section className="page">
-  <p className="eyebrow">Project documentation & presentations</p><h1>Deliverables with their history intact.</h1><p className="lead">This area is for the team’s Software Engineering deliverables. Each published version will retain its presentation date, authors, and change summary.</p>
-  <div className="deliverable-list"><article className="deliverable current-deliverable"><div className="deliverable-number">01</div><div><p className="eyebrow">Current deliverable</p><h2>Planning Presentation v1</h2><p>Initial planning presentation for the SmartToken project.</p><dl><div><dt>Presentation date</dt><dd>—</dd></div><div><dt>Version</dt><dd>v1</dd></div><div><dt>Authors</dt><dd>Arnav Chachra · Kunwar Shauryaveer · Piyush Sharan</dd></div></dl></div><a className="button" href="#/planning-v1">Open presentation <ArrowIcon /></a></article></div>
-</section> }
+function Presentations() {
+  return (
+    <section className="page">
+      <p className="eyebrow">Project documentation & presentations</p>
+      <h1>Deliverables with their history intact.</h1>
+      <p className="lead">This area is for the team’s Software Engineering deliverables. Each published version will retain its presentation date, authors, and change summary.</p>
+      <div className="deliverable-list">
+        {presentations.map(item => (
+          <article className={item.isCurrent ? 'deliverable current-deliverable' : 'deliverable'} key={item.id}>
+            <div className="deliverable-number">{item.number}</div>
+            <div>
+              <p className="eyebrow">{item.eyebrow}</p>
+              <h2>{item.title}</h2>
+              <p>{item.summary}</p>
+              <dl>
+                <div><dt>Presentation date</dt><dd>{item.date}</dd></div>
+                <div><dt>Version</dt><dd>{item.version}</dd></div>
+                <div><dt>Authors</dt><dd>{item.authors}</dd></div>
+              </dl>
+            </div>
+            <a className="button" href={`#/${item.id}`}>Open presentation <ArrowIcon /></a>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
 
-function PlanningV1() {
-  const [planningV1Page, setPlanningV1Page] = useState(1)
+function PresentationPage({ presentation }) {
+  const [currentPage, setCurrentPage] = useState(1)
+  const headingId = `${presentation.id}-pdf-heading`
 
   return (
     <section className="page presentation-page">
-      <a className="back-link" href="#/presentations">← All presentations</a><p className="eyebrow">Current deliverable · v1</p><h1>Planning Presentation v1</h1><p className="lead">The team will present this planning material directly from the SmartToken website.</p>
-      <div className="presentation-meta"><div><span>Presentation date</span><strong>—</strong></div><div><span>Version</span><strong>v1</strong></div><div><span>Authors</span><strong>Arnav Chachra · Kunwar Shauryaveer · Piyush Sharan</strong></div></div>
-      <div className="presentation-stage"><div className="stage-top"><span className="stage-mark"><TokenIcon /></span><span>SmartToken / Planning v1</span></div><div className="stage-content"><p className="eyebrow">Planning presentation</p><h2>SmartToken</h2></div></div>
-      <section className="pdf-viewer-shell" aria-labelledby="planning-v1-pdf-heading">
+      <a className="back-link" href="#/presentations">← All presentations</a>
+      <p className="eyebrow">{presentation.eyebrow} · {presentation.version}</p>
+      <h1>{presentation.title}</h1>
+      <p className="lead">{presentation.lead}</p>
+      <div className="presentation-meta">
+        <div><span>Presentation date</span><strong>{presentation.date}</strong></div>
+        <div><span>Version</span><strong>{presentation.version}</strong></div>
+        <div><span>Authors</span><strong>{presentation.authors}</strong></div>
+      </div>
+      <div className="presentation-stage">
+        <div className="stage-top"><span className="stage-mark"><TokenIcon /></span><span>{presentation.stageLabel}</span></div>
+        <div className="stage-content"><p className="eyebrow">Planning presentation</p><h2>SmartToken</h2></div>
+      </div>
+      <section className="pdf-viewer-shell" aria-labelledby={headingId}>
         <div className="pdf-viewer-header">
           <div>
-            <p className="eyebrow" id="planning-v1-pdf-heading">Open presentation PDF</p>
-            <h2>Planning Presentation v1</h2>
+            <p className="eyebrow" id={headingId}>Open presentation PDF</p>
+            <h2>{presentation.title}</h2>
           </div>
           <div className="pdf-viewer-actions">
-            <span className="pdf-page-indicator">Page {planningV1Page} / {planningV1PageCount}</span>
-            <a className="text-link" href="/presentations/planning-v1.pdf" target="_blank" rel="noreferrer">Open PDF in new tab <ArrowIcon /></a>
+            <span className="pdf-page-indicator">Page {currentPage} / {presentation.pageCount}</span>
+            <a className="text-link" href={presentation.pdfUrl} target="_blank" rel="noreferrer">Open PDF in new tab <ArrowIcon /></a>
           </div>
         </div>
         <div className="pdf-viewer-controls" aria-label="PDF navigation controls">
-          <button className="pdf-nav-button" type="button" onClick={() => setPlanningV1Page(current => Math.max(1, current - 1))} disabled={planningV1Page === 1}>← Previous</button>
-          <button className="pdf-nav-button" type="button" onClick={() => setPlanningV1Page(current => Math.min(planningV1PageCount, current + 1))} disabled={planningV1Page === planningV1PageCount}>Next →</button>
+          <button className="pdf-nav-button" type="button" onClick={() => setCurrentPage(current => Math.max(1, current - 1))} disabled={currentPage === 1}>← Previous</button>
+          <button className="pdf-nav-button" type="button" onClick={() => setCurrentPage(current => Math.min(presentation.pageCount, current + 1))} disabled={currentPage === presentation.pageCount}>Next →</button>
         </div>
         <div className="pdf-viewer-frame">
           <img
             className="pdf-viewer"
-            src={planningV1PageImage(planningV1Page)}
-            alt={`Planning Presentation v1 page ${planningV1Page}`}
+            src={getPresentationPageImage(presentation.pageImagePrefix, currentPage)}
+            alt={`${presentation.title} page ${currentPage}`}
           />
         </div>
       </section>
-      <div className="change-log"><h2>Version notes</h2><p><strong>v1 · Initial planning presentation.</strong></p></div>
+      <div className="change-log"><h2>Version notes</h2><p><strong>{presentation.versionNotes}</strong></p></div>
     </section>
   )
 }
